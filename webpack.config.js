@@ -1,21 +1,23 @@
 
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 module.exports = {
     entry: {
         index:'./src/index.js',
-        dateRange:'./src/DateRange.js'
+        select:'./src/LabelValue.js'
     },
     output:{
         path: path.resolve(__dirname, 'dist'),
-        filename:'[name].js'
+        filename:'[name].js',
+        //libraryExport:'DateRange',
+        //libraryTarget: 'commonjs2'
     },
     module:{
         rules:[
             {
                 test: /\.(js|jsx)$/,
-                exclude: /node_modules/,
+                exclude: /(node_modules|build)/,
                 use:{
                     loader:'babel-loader'
                 }
@@ -23,7 +25,8 @@ module.exports = {
             {
                 test: /(.scss|.css)$/,
                 use: [
-                    'style-loader',
+                    MiniCssExtractPlugin.loader,
+
                     {
                         loader: 'css-loader',
                         options: {
@@ -45,7 +48,7 @@ module.exports = {
         ]
     },
     devServer:{
-        port: 8081,
+        port: 8180,
         contentBase: path.join(__dirname, 'dist'),
         watchOptions: {
             hot: true,
@@ -53,7 +56,11 @@ module.exports = {
             poll: true
         }
     },
+    externals: {
+        //'react': 'commonjs react'
+    },
     plugins:[
+        new MiniCssExtractPlugin(),
         new HtmlWebpackPlugin({template:'./src/index.html'})
     ]
 }

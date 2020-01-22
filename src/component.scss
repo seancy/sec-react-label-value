@@ -1,0 +1,67 @@
+
+.sec-react-label-value {
+  position: relative;
+
+
+  .element-wrapper {
+    display: flex;
+
+    .se-react-dropdown {
+      display: inline-block;
+      vertical-align: middle;
+
+      .select {
+        position: relative;
+      }
+    }
+
+    .input-wrapper {
+      display: flex;
+      border: 1px solid #ccc;
+      height: 35px;
+      vertical-align: middle;
+      margin-left: 10px;
+      padding-left: 15px;
+
+      .search-icon {
+        width: 16px;
+        padding-right: 5px;
+      }
+
+      .label {
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        text-transform: capitalize;
+      }
+
+      .box {
+        font-size: 16px;
+        border: none;
+        flex: 1;
+        padding: 0 10px;
+        outline: none;
+      }
+
+    }
+
+    .data-clear {
+      display: flex;
+      margin-left: 10px;
+      border: 1px solid #ccc;
+
+      .sync-icon {
+        width: 16px;
+        padding: 0 8px;
+        cursor: pointer;
+      }
+    }
+
+  }
+
+  .selected-wrapper {
+
+  }
+
+
+}
