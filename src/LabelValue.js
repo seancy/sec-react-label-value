@@ -4,6 +4,7 @@ import ReactDOM from "react-dom";
 import "./component.scss"
 import SearchIcon from './search-solid.svg'
 import SyncIcon from './sync-alt-solid.svg'
+import TimesIcon from './times-solid.svg'
 import Dropdown from 'se-react-dropdown'
 
 class LabelValue extends React.Component {
@@ -11,8 +12,14 @@ class LabelValue extends React.Component {
         super(props, context);
 
         this.state = {
-            data: props.data,
-            selectedList: [{text:'t1', value:'v1'}],
+            //data: props.data,
+            selectedList: [{text:'name', value:'Judy'},
+                {text:'name', value:'Anny'},
+                {text:'name', value:'Stuff'},
+                {text:'city', value:'San Francisco'},
+                {text:'country', value:'USA'}
+            ],
+            value:'',
             label: ''
         };
 
@@ -47,18 +54,44 @@ class LabelValue extends React.Component {
     }
 
     append(e) {
-        let val = e.currentTarget.value;
-        this.setState({
-            selectedList: (prev) => {
-                return prev.append({ text:this.state.label, value:val });
+        const json = { text:this.state.label, value:e.target.value }
+        this.setState(state=>{
+            const selectedList = state.selectedList.concat(json)
+            return {
+                selectedList
             }
         })
 
     }
 
+    removeSelected(item){
+        this.setState(state=>{
+            const selectedList = state.selectedList.filter(p=>(p.text != item.text || p.value != item.value))
+            return {
+                selectedList
+            }
+        })
+
+    }
+
+    clean(){
+        this.setState(state=>{
+            return {
+                selectedList:[]
+            }
+        })
+    }
+
+    _handleKeyDown(e){
+        if (e.key === 'Enter') {
+            this.append(e)
+
+        }
+    }
+
     render() {
         const {data} = this.props
-        const {label, selectedList} = this.state;
+        const {label, value, selectedList} = this.state;
         return (
             <div className={'sec-react-label-value ' + (this.props.className || '')}>
                 <div className="element-wrapper">
@@ -66,20 +99,21 @@ class LabelValue extends React.Component {
                     <div className="input-wrapper">
                         <SearchIcon className="search-icon"/>
                         <span className="label">{label}:</span>
-                        <input className="box" type="text" onClick={this.append.bind(this)}
+                        <input className="box" type="text"
+                               onKeyDown={this._handleKeyDown.bind(this)}
                                placeholder="press enter to add"/>
 
                     </div>
-                    <span className="data-clear">
+                    <span className="data-clear" onClick={this.clean.bind(this)}>
                         <SyncIcon className="sync-icon"/>
                     </span>
                 </div>
-                <div className="selected-wrapper">
+                <ul className="selected-wrapper">
                     {selectedList.map(item=>(
-                        <span>{item.text}--{item.value}</span>
+                        <li><span>{item.text+':'+item.value}</span><TimesIcon onClick={this.removeSelected.bind(this, item)}/></li>
                     ))}
 
-                </div>
+                </ul>
 
 
                 {/*<div className="select" onClick={this.toggle.bind(this)}>
