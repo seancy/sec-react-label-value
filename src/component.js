@@ -7,47 +7,24 @@ import SyncIcon from './sync-alt-solid.svg'
 import TimesIcon from './times-solid.svg'
 import Dropdown from 'se-react-dropdown'
 
-class LabelValue extends React.Component {
+class Component extends React.Component {
     constructor(props, context) {
         super(props, context);
 
         this.state = {
             //data: props.data,
-            selectedList: [{text:'name', value:'Judy'},
+            selectedList: props.selectedList || [
+                /*{text:'name', value:'Judy'},
                 {text:'name', value:'Anny'},
                 {text:'name', value:'Stuff'},
                 {text:'city', value:'San Francisco'},
-                {text:'country', value:'USA'}
+                {text:'country', value:'USA'}*/
             ],
             value:'',
             label: ''
         };
 
-        //this.myRef = React.createRef();
-
-        //document.addEventListener("click", this.hidePanel.bind(this), true);
     }
-
-    /*hidePanel = e => {
-        if (!this.myRef.current) {
-            return;
-        }
-        const root = ReactDOM.findDOMNode(this.myRef.current);
-        if (root && root.contains(e.target) && this.container !== e.target) {
-            return;
-        }
-        this.setState({isOpen: false});
-    };
-
-    toggle = () => {
-        this.setState({isOpen: !this.state.isOpen});
-    };
-
-    select = (item) => {
-        this.setState({
-            selected: item
-        })
-    }*/
 
     updateLabel(dropdownItem) {
         this.setState({label: dropdownItem.text})
@@ -55,11 +32,14 @@ class LabelValue extends React.Component {
 
     append(e) {
         const json = { text:this.state.label, value:e.target.value }
+        const {onEnter} = this.props
         this.setState(state=>{
             const selectedList = state.selectedList.concat(json)
             return {
                 selectedList
             }
+        }, ()=>{
+            onEnter && onEnter(this.state.selectedList)
         })
 
     }
@@ -85,7 +65,6 @@ class LabelValue extends React.Component {
     _handleKeyDown(e){
         if (e.key === 'Enter') {
             this.append(e)
-
         }
     }
 
@@ -95,7 +74,7 @@ class LabelValue extends React.Component {
         return (
             <div className={'sec-react-label-value ' + (this.props.className || '')}>
                 <div className="element-wrapper">
-                    <Dropdown data={data} onChange={this.updateLabel.bind(this)}/>
+                    <Dropdown data={data} onChange={this.updateLabel.bind(this)} />
                     <div className="input-wrapper">
                         <SearchIcon className="search-icon"/>
                         <span className="label">{label}:</span>
@@ -112,23 +91,10 @@ class LabelValue extends React.Component {
                     {selectedList.map(item=>(
                         <li><span>{item.text+':'+item.value}</span><TimesIcon onClick={this.removeSelected.bind(this, item)}/></li>
                     ))}
-
                 </ul>
-
-
-                {/*<div className="select" onClick={this.toggle.bind(this)}>
-                    <span className="text">{selected.text || ''}</span>
-                    {isOpen? (<ChevronUp/>):(<ChevronDown/>)}
-                </div>
-                <ul className={'panel' + (!this.state.isOpen && ' hide' || '')}>
-                    {this.state.data.map(item => (
-                        <li key={item.text} onClick={this.select.bind(this, item)} value={item.value}>{item.text}</li>
-                    ))}
-                </ul>*/}
             </div>
         );
     }
 }
 
-export default LabelValue;
-
+export default Component;
