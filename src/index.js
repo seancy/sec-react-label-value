@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "react-dom";
-import LabelValue from "./LabelValue";
+import Component from "./component";
 
 const styles = {
   fontFamily: "sans-serif",
@@ -18,7 +18,7 @@ const arr = [
 
 const App = () => (
   <div style={styles}>
-    <LabelValue data={arr} />
+    <Component data={arr} />
   </div>
 );
 
