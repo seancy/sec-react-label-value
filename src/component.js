@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import PropTypes from 'prop-types'
 
 import "./component.scss"
 import SearchIcon from './search-solid.svg'
@@ -32,7 +32,7 @@ class Component extends React.Component {
 
     append(e) {
         const json = { text:this.state.label, value:e.target.value }
-        const {onEnter} = this.props
+        const {onEnter,onChange} = this.props
         this.setState(state=>{
             const selectedList = state.selectedList.concat(json)
             return {
@@ -40,16 +40,21 @@ class Component extends React.Component {
             }
         }, ()=>{
             onEnter && onEnter(this.state.selectedList)
+            onChange && onChange(this.state.selectedList)
         })
 
     }
 
     removeSelected(item){
+        const {onRemove, onChange} = this.props
         this.setState(state=>{
             const selectedList = state.selectedList.filter(p=>(p.text != item.text || p.value != item.value))
             return {
                 selectedList
             }
+        }, ()=>{
+            onRemove && onRemove(this.state.selectedList)
+            onChange && onChange(this.state.selectedList)
         })
 
     }
@@ -70,7 +75,7 @@ class Component extends React.Component {
 
     render() {
         const {data} = this.props
-        const {label, value, selectedList} = this.state;
+        const {label, selectedList} = this.state;
         return (
             <div className={'sec-react-label-value ' + (this.props.className || '')}>
                 <div className="element-wrapper">
@@ -89,7 +94,7 @@ class Component extends React.Component {
                 </div>
                 <ul className="selected-wrapper">
                     {selectedList.map(item=>(
-                        <li><span>{item.text+':'+item.value}</span><TimesIcon onClick={this.removeSelected.bind(this, item)}/></li>
+                        <li key={`${item.text}-${item.value}`}><span>{item.text+':'+item.value}</span><TimesIcon onClick={this.removeSelected.bind(this, item)}/></li>
                     ))}
                 </ul>
             </div>
@@ -98,3 +103,13 @@ class Component extends React.Component {
 }
 
 export default Component;
+
+Component.propTypes = {
+    data:PropTypes.arrayOf(PropTypes.exact({
+        value:PropTypes.string,
+        text:PropTypes.string
+    })),
+    onEnter:PropTypes.func,
+    onRemove:PropTypes.func,
+    onChange:PropTypes.func,
+}
