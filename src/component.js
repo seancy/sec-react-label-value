@@ -11,37 +11,59 @@ class Component extends React.Component {
     constructor(props, context) {
         super(props, context);
 
+        const selectedList = (props.selectedList || []).map(p=>({...p, focus: false}))
         this.state = {
-            //data: props.data,
-            selectedList: props.selectedList || [
-                /*{text:'name', value:'Judy'},
-                {text:'name', value:'Anny'},
-                {text:'name', value:'Stuff'},
-                {text:'city', value:'San Francisco'},
-                {text:'country', value:'USA'}*/
-            ],
-            value:'',
-            label: ''
+            selectedList: selectedList || [], //user selected value from dropdown + user input value
+
+            selectedItem:null,
+            value:''
         };
 
+        this.myRef = React.createRef()
     }
 
-    updateLabel(dropdownItem) {
-        this.setState({label: dropdownItem.text})
+    componentDidMount() {
+        setTimeout(()=>{
+            this.myRef.current.classList.remove('hidden')
+        },400)
     }
 
     append(e) {
-        const json = { text:this.state.label, value:e.target.value }
+        const json = { text:this.state.label, key:this.state.key, value:e.target.value, focus: false }
         const {onEnter,onChange} = this.props
-        this.setState(state=>{
-            const selectedList = state.selectedList.concat(json)
-            return {
-                selectedList
-            }
-        }, ()=>{
-            onEnter && onEnter(this.state.selectedList)
-            onChange && onChange(this.state.selectedList)
+        const item = this.state.selectedList.find(p=>{
+            return p.text== this.state.label && p.value == e.target.value
         })
+        if (!item){
+            this.setState(state=>{
+                const selectedList = state.selectedList.concat(json)
+                return {
+                    selectedList
+                }
+            }, ()=>{
+                this.setState({
+                    value:''
+                })
+                onEnter && onEnter(this.state.selectedList)
+                onChange && onChange(this.state.selectedList)
+            })
+        }else{
+            this.setState(prevState=>{
+                let selectedList = prevState.selectedList.map(p=>{
+                    let focus = false
+                    if (p.text == item.text && p.value==item.value){
+                        focus=true
+                    }
+                    return {...p, focus}
+                })
+
+                console.log(selectedList)
+                return {
+                    selectedList
+                }
+            })
+        }
+
 
     }
 
@@ -53,8 +75,9 @@ class Component extends React.Component {
                 selectedList
             }
         }, ()=>{
-            onRemove && onRemove(this.state.selectedList)
-            onChange && onChange(this.state.selectedList)
+            const {selectedList} = this.state
+            onRemove && onRemove(selectedList)
+            onChange && onChange(selectedList)
         })
 
     }
@@ -73,17 +96,34 @@ class Component extends React.Component {
         }
     }
 
+    updateValue(e){
+        this.setState({
+            value:e.target.value
+        })
+    }
+
+    getSelectedItem(){
+        const {data}=this.props
+        return this.state.selectedItem || (data.length?data[0]:{})
+    }
+
+    updateSelectedItem(selectedItem) {
+        this.setState({selectedItem})
+    }
+
     render() {
         const {data} = this.props
-        const {label, selectedList} = this.state;
+        const { selectedList, selectedItem } = this.state;
         return (
-            <div className={'sec-react-label-value ' + (this.props.className || '')}>
+            <div ref={this.myRef} className={'sec-react-label-value hidden ' + (this.props.className || '')}>
                 <div className="element-wrapper">
-                    <Dropdown data={data} onChange={this.updateLabel.bind(this)} />
+                    <Dropdown data={data} onChange={this.updateSelectedItem.bind(this)} />
                     <div className="input-wrapper">
                         <SearchIcon className="search-icon"/>
-                        <span className="label">{label}:</span>
+                        <span className="label">{this.getSelectedItem().text || ''}:</span>
                         <input className="box" type="text"
+                               value={this.state.value}
+                               onChange={this.updateValue.bind(this)}
                                onKeyDown={this._handleKeyDown.bind(this)}
                                placeholder="press enter to add"/>
 
@@ -94,7 +134,7 @@ class Component extends React.Component {
                 </div>
                 <ul className="selected-wrapper">
                     {selectedList.map(item=>(
-                        <li key={`${item.text}-${item.value}`}><span>{item.text+':'+item.value}</span><TimesIcon onClick={this.removeSelected.bind(this, item)}/></li>
+                        <li key={`${item.text}-${item.value}`} className={item.focus?'animation':''}><span>{item.text+':'+item.value}</span><TimesIcon onClick={this.removeSelected.bind(this, item)}/></li>
                     ))}
                 </ul>
             </div>
