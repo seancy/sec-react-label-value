@@ -49,9 +49,11 @@
       display: flex;
       margin-left: 10px;
       border: 1px solid #ccc;
+      align-items: center;
 
       .sync-icon {
         width: 16px;
+        height: 16px;
         padding: 0 8px;
         cursor: pointer;
       }

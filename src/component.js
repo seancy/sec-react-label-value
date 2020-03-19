@@ -22,17 +22,12 @@ class Component extends React.Component {
         this.myRef = React.createRef()
     }
 
-    componentDidMount() {
-        setTimeout(()=>{
-            this.myRef.current.classList.remove('hidden')
-        },400)
-    }
-
     append(e) {
-        const json = { text:this.state.label, key:this.state.key, value:e.target.value, focus: false }
-        const {onEnter,onChange} = this.props
+        const selectedItem = this.getSelectedItem()
+        const json = { text:selectedItem.text, key:selectedItem.value, value:e.target.value, focus: false }
+        const {onEnter} = this.props
         const item = this.state.selectedList.find(p=>{
-            return p.text== this.state.label && p.value == e.target.value
+            return p.key== selectedItem.value && p.value == e.target.value
         })
         if (!item){
             this.setState(state=>{
@@ -45,7 +40,7 @@ class Component extends React.Component {
                     value:''
                 })
                 onEnter && onEnter(this.state.selectedList)
-                onChange && onChange(this.state.selectedList)
+                this.fireChange()
             })
         }else{
             this.setState(prevState=>{
@@ -56,8 +51,6 @@ class Component extends React.Component {
                     }
                     return {...p, focus}
                 })
-
-                console.log(selectedList)
                 return {
                     selectedList
                 }
@@ -68,7 +61,7 @@ class Component extends React.Component {
     }
 
     removeSelected(item){
-        const {onRemove, onChange} = this.props
+        const {onRemove} = this.props
         this.setState(state=>{
             const selectedList = state.selectedList.filter(p=>(p.text != item.text || p.value != item.value))
             return {
@@ -77,17 +70,18 @@ class Component extends React.Component {
         }, ()=>{
             const {selectedList} = this.state
             onRemove && onRemove(selectedList)
-            onChange && onChange(selectedList)
+            this.fireChange()
         })
 
     }
 
     clean(){
-        this.setState(state=>{
-            return {
-                selectedList:[]
-            }
-        })
+        this.setState({ selectedList:[] }, this.fireChange.bind(this))
+    }
+
+    fireChange(){
+        const {onChange} = this.props
+        onChange && onChange(this.state.selectedList)
     }
 
     _handleKeyDown(e){
@@ -113,9 +107,9 @@ class Component extends React.Component {
 
     render() {
         const {data} = this.props
-        const { selectedList, selectedItem } = this.state;
+        const { selectedList } = this.state;
         return (
-            <div ref={this.myRef} className={'sec-react-label-value hidden ' + (this.props.className || '')}>
+            <div ref={this.myRef} className={'sec-react-label-value ' + (this.props.className || '')}>
                 <div className="element-wrapper">
                     <Dropdown data={data} onChange={this.updateSelectedItem.bind(this)} />
                     <div className="input-wrapper">
