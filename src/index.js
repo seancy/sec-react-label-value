@@ -35,7 +35,9 @@ class App extends React.Component {
     render(){
         return (
           <div >
-            <Component data={this.state.data} onChange={(data)=>console.log(data)} />
+            <Component data={this.state.data}
+                       //selectedList={arr}
+                       onChange={(data)=>console.log(data)} />
           </div>
         );
     }

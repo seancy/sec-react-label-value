@@ -6,6 +6,7 @@ import SearchIcon from './search-solid.svg'
 import SyncIcon from './sync-alt-solid.svg'
 import TimesIcon from './times-solid.svg'
 import Dropdown from 'se-react-dropdown'
+import {get} from 'loadsh'
 
 class Component extends React.Component {
     constructor(props, context) {
@@ -20,6 +21,12 @@ class Component extends React.Component {
         };
 
         this.myRef = React.createRef()
+    }
+
+    componentDidMount() {
+        if (get(this, 'props.selectedList', []).length > 0){
+            this.fireChange()
+        }
     }
 
     append(e) {
@@ -126,9 +133,9 @@ class Component extends React.Component {
                         <SyncIcon className="sync-icon"/>
                     </span>
                 </div>
-                <ul className="selected-wrapper">
+                <ul className={"selected-wrapper" + selectedList.length <= 0 ? ' hideden' :''}>
                     {selectedList.map(item=>(
-                        <li key={`${item.text}-${item.value}`} className={item.focus?'animation':''}><span>{item.text+':'+item.value}</span><TimesIcon onClick={this.removeSelected.bind(this, item)}/></li>
+                        <li key={`${item.text}-${item.value}`} className={item.focus?'animation':''}><span>{item.text+': '+item.value}</span><TimesIcon onClick={this.removeSelected.bind(this, item)}/></li>
                     ))}
                 </ul>
             </div>
