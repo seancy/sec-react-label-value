@@ -133,7 +133,7 @@ class Component extends React.Component {
                         <SyncIcon className="sync-icon"/>
                     </span>
                 </div>
-                <ul className={"selected-wrapper" + (selectedList.length <= 0 ? ' hideden' :'')}>
+                <ul className={"selected-wrapper" + (selectedList.length <= 0 ? ' hidden' :'')}>
                     {selectedList.map(item=>(
                         <li key={`${item.text}-${item.value}`} className={item.focus?'animation':''}><span>{item.text+': '+item.value}</span><TimesIcon onClick={this.removeSelected.bind(this, item)}/></li>
                     ))}
