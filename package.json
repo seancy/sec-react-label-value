@@ -1,6 +1,6 @@
 {
   "name": "sec-react-label-value",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "main": "dist/component.js",
   "scripts": {
     "start": "webpack-dev-server",
