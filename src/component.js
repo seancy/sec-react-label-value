@@ -92,8 +92,13 @@ class Component extends React.Component {
     }
 
     _handleKeyDown(e){
-        if (e.key === 'Enter') {
+        if (e.key == 'Enter') {
             this.append(e)
+            if (this.props.stopEventSpread){
+                e.preventDefault();
+                e.stopPropagation()
+                return false;
+            }
         }
     }
 
@@ -113,14 +118,19 @@ class Component extends React.Component {
     }
 
     render() {
-        const {data} = this.props
+        const {data,useFontAwesome} = this.props
         const { selectedList } = this.state;
+        const CleverSearchIcon = useFontAwesome ? ()=><i className="fal fa-search search-icon"/> : ()=><SearchIcon className="search-icon"/>;
+        const CleverSyncIcon = useFontAwesome ? ()=><i className="fal fa-sync sync-icon"/> : ()=><SyncIcon className="sync-icon"/>;
+        const CleverTimesIcon = useFontAwesome ? props=><i {...props} className="fal fa-times"/> : ()=><TimesIcon {...props} />;
+
         return (
             <div ref={this.myRef} className={'sec-react-label-value ' + (this.props.className || '')}>
                 <div className="element-wrapper">
                     <Dropdown data={data} onChange={this.updateSelectedItem.bind(this)} />
                     <div className="input-wrapper">
-                        <SearchIcon className="search-icon"/>
+                        {/*<SearchIcon className="search-icon"/>*/}
+                        <CleverSearchIcon/>
                         <span className="label">{this.getSelectedItem().text || ''}:</span>
                         <input className="box" type="text"
                                value={this.state.value}
@@ -130,12 +140,12 @@ class Component extends React.Component {
 
                     </div>
                     <span className="data-clear" onClick={this.clean.bind(this)}>
-                        <SyncIcon className="sync-icon"/>
+                        <CleverSyncIcon className="sync-icon"/>
                     </span>
                 </div>
                 <ul className={"selected-wrapper" + (selectedList.length <= 0 ? ' hidden' :'')}>
                     {selectedList.map(item=>(
-                        <li key={`${item.text}-${item.value}`} className={item.focus?'animation':''}><span>{item.text+': '+item.value}</span><TimesIcon onClick={this.removeSelected.bind(this, item)}/></li>
+                        <li key={`${item.text}-${item.value}`} className={item.focus?'animation':''}><span>{item.text+': '+item.value}</span><CleverTimesIcon onClick={this.removeSelected.bind(this, item)}/></li>
                     ))}
                 </ul>
             </div>
