@@ -37,7 +37,8 @@ class App extends React.Component {
           <div >
             <Component data={this.state.data}
                        //selectedList={arr}
-                useFontAwesome={true}
+                placeholder={'enter text.'}
+                //useFontAwesome={true}
                 stopEventSpread={true}
                        onChange={(data)=>console.log(data)} />
           </div>

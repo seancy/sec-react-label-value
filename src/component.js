@@ -12,12 +12,12 @@ class Component extends React.Component {
     constructor(props, context) {
         super(props, context);
 
-        const selectedList = (props.selectedList || []).map(p=>({...p, focus: false}))
+        const selectedList = (props.selectedList || []).map(p=>({...p}))
         this.state = {
             selectedList: selectedList || [], //user selected value from dropdown + user input value
 
             selectedItem:null,
-            value:''
+            value:'' //the value of input box
         };
 
         this.myRef = React.createRef()
@@ -31,40 +31,39 @@ class Component extends React.Component {
 
     append(e) {
         const selectedItem = this.getSelectedItem()
-        const json = { text:selectedItem.text, key:selectedItem.value, value:e.target.value, focus: false }
+        const json = { text:selectedItem.text, key:selectedItem.value, value:e.target.value}
         const {onEnter} = this.props
         const item = this.state.selectedList.find(p=>{
-            return p.key== selectedItem.value && p.value == e.target.value
+            return p.key== selectedItem.value //&& p.value == e.target.value
         })
+        const callback = ()=>{
+            this.setState({
+                value:''
+            })
+            onEnter && onEnter(this.state.selectedList)
+            this.fireChange()
+        }
         if (!item){
             this.setState(state=>{
                 const selectedList = state.selectedList.concat(json)
                 return {
                     selectedList
                 }
-            }, ()=>{
-                this.setState({
-                    value:''
-                })
-                onEnter && onEnter(this.state.selectedList)
-                this.fireChange()
-            })
+            }, callback)
         }else{
             this.setState(prevState=>{
                 let selectedList = prevState.selectedList.map(p=>{
-                    let focus = false
-                    if (p.text == item.text && p.value==item.value){
-                        focus=true
+                    if (p.key==json.key){
+                        return json
+                    }else{
+                        return p
                     }
-                    return {...p, focus}
                 })
                 return {
                     selectedList
                 }
-            })
+            }, callback)
         }
-
-
     }
 
     removeSelected(item){
@@ -118,11 +117,11 @@ class Component extends React.Component {
     }
 
     render() {
-        const {data,useFontAwesome} = this.props
+        const {data,useFontAwesome,placeholder} = this.props
         const { selectedList } = this.state;
         const CleverSearchIcon = useFontAwesome ? ()=><i className="fal fa-search search-icon"/> : ()=><SearchIcon className="search-icon"/>;
-        const CleverSyncIcon = useFontAwesome ? ()=><i className="fal fa-sync sync-icon"/> : ()=><SyncIcon className="sync-icon"/>;
-        const CleverTimesIcon = useFontAwesome ? props=><i {...props} className="fal fa-times"/> : ()=><TimesIcon {...props} />;
+        const CleverSyncIcon = useFontAwesome ? ()=><i className="fal fa-trash-alt sync-icon"/> : ()=><SyncIcon className="sync-icon"/>;
+        const CleverTimesIcon = useFontAwesome ? props=><i className="fal fa-times" {...props}/> : props=><TimesIcon {...props}/>;
 
         return (
             <div ref={this.myRef} className={'sec-react-label-value ' + (this.props.className || '')}>
@@ -136,7 +135,7 @@ class Component extends React.Component {
                                value={this.state.value}
                                onChange={this.updateValue.bind(this)}
                                onKeyDown={this._handleKeyDown.bind(this)}
-                               placeholder="press enter to add"/>
+                               placeholder={placeholder || "press enter to add"}/>
 
                     </div>
                     <span className="data-clear" onClick={this.clean.bind(this)}>
@@ -145,7 +144,7 @@ class Component extends React.Component {
                 </div>
                 <ul className={"selected-wrapper" + (selectedList.length <= 0 ? ' hidden' :'')}>
                     {selectedList.map(item=>(
-                        <li key={`${item.text}-${item.value}`} className={item.focus?'animation':''}><span>{item.text+': '+item.value}</span><CleverTimesIcon onClick={this.removeSelected.bind(this, item)}/></li>
+                        <li key={`${item.text}-${item.value}`}><span>{item.text+': '+item.value}</span><CleverTimesIcon onClick={this.removeSelected.bind(this, item)}/></li>
                     ))}
                 </ul>
             </div>
@@ -160,6 +159,7 @@ Component.propTypes = {
         value:PropTypes.string,
         text:PropTypes.string
     })),
+    placeholder:PropTypes.string,
     onEnter:PropTypes.func,
     onRemove:PropTypes.func,
     onChange:PropTypes.func,
